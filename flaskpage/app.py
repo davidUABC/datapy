@@ -14,13 +14,62 @@ def saludoatodos():
 def sobremi():
     return "<marquee><h1> orquidea.rivera@uabc.edu.mx </h1></marquee>"
 
+@app.route("/mineria")
+def mineria():
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    # Modificación del script para adaptarlo al archivo Excel proporcionado
+    # Cargar el archivo Excel y la hoja "Principal"
+    data_excel = pd.ExcelFile('Copia de bourdain_travel_places1.xlsx')
+    data = data_excel.parse("Principal")
+
+    # Limpieza y preparación básica de datos
+    data = data[['show', 'season', 'ep', 'city_or_area (codigo postal)', 'did_he_like_it']]
+    data = data.rename(columns={
+        'city_or_area (codigo postal)': 'city_or_area',
+        'did_he_like_it': 'liked'
+    })
+
+    # Asegurar que las columnas tienen los tipos correctos
+    data['liked'] = data['liked'].astype('int')  # Convertir "liked" a entero si no lo es
+
+    # Análisis básico: Lugares visitados por temporada
+    places_per_season = data.groupby('season').size()
+
+    # Visualización: Lugares visitados por temporada
+    plt.figure(figsize=(10, 6))
+    places_per_season.plot(kind='bar', color='skyblue', edgecolor='black')
+    plt.title('Cantidad de Lugares Visitados por Temporada', fontsize=14)
+    plt.xlabel('Temporada', fontsize=12)
+    plt.ylabel('Cantidad de Lugares', fontsize=12)
+    plt.xticks(rotation=0)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+    # Análisis: Porcentaje de lugares que le gustaron
+    liked_percentage = data['liked'].value_counts(normalize=True) * 100
+
+    # Visualización: Porcentaje de lugares que le gustaron o no
+    plt.figure(figsize=(8, 6))
+    liked_percentage.plot(kind='pie', autopct='%1.1f%%', colors=['gold', 'lightcoral'], labels=['Sí', 'No'],
+                          startangle=90)
+    plt.title('Porcentaje de Lugares que le Gustaron a Bourdain', fontsize=14)
+    plt.ylabel('')
+    plt.show()
+    plt.savefig('C:/Users/2177/datapy/flaskpage/static/images/grafica.png')
+
+    # Mostrar la gráfica
+    plt.show()
+    return render_template("grafica.html")
+
 @app.route("/grafica")
 def grafica():
     import pandas as pd
     import matplotlib.pyplot as plt
 
     # Cargar el archivo Excel
-    archivo_excel = 'NASCAR.xlsx'  # Cambia esto si el archivo está en otra ubicación
+    archivo_excel = 'C:/Users/2177/datapy/flaskpage/NASCAR.xlsx'  # Cambia esto si el archivo está en otra ubicación
     df = pd.read_excel(archivo_excel)
 
     # 1. Cantidad total de puntos por cada fabricante
@@ -78,7 +127,7 @@ def grafica():
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     # Guardar la grafica en un archivo (En este caso, PNG)
-    plt.savefig('.\static\images\grafica.png')
+    plt.savefig('C:/Users/2177/datapy/flaskpage/static/images/grafica.png')
 
     # Mostrar la gráfica
     plt.show()
